@@ -2,578 +2,483 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asistente Formativo · SENA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>Asistente de Proyecto Formativo · SENA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --fondo: #EEF5F1;
+    --superficie: #FFFFFF;
+    --suave: #F4F9F6;
+    --linea: #DCE8E1;
+    --texto: #1B2A26;
+    --texto-2: #62716C;
+    --texto-3: #98A5A0;
+    --primario: #1F5C45;      /* verde profundo */
+    --primario-2: #174836;
+    --primario-tinte: #E3F0E8;
+    --vivo: #39A900;          /* verde SENA, solo en detalles pequeños */
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Inter', sans-serif;
-    background: #eef2f0;
+    font-family: 'Work Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--texto);
+    background: var(--fondo);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    -webkit-font-smoothing: antialiased;
   }
+  :focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; }
 
-  /* ── HEADER ── */
-  .header {
-    background: linear-gradient(135deg, #002D1F 0%, #004D35 55%, #006B4A 100%);
-    padding: 0 28px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    box-shadow: 0 3px 16px rgba(0,45,31,0.35);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  /* ── BARRA SUPERIOR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(160%) blur(10px);
+    -webkit-backdrop-filter: saturate(160%) blur(10px);
+    border-bottom: 1px solid var(--linea);
+    border-top: 3px solid var(--primario);
+    padding: 12px 0;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
   }
-  .header-logo {
-    width: 46px;
-    height: 46px;
-    background: white;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; gap: 12px; }
+  .marca {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--primario);
+    display: grid; place-items: center; flex-shrink: 0;
   }
-  .header-divider {
-    width: 1px;
-    height: 32px;
-    background: rgba(255,255,255,0.2);
-    flex-shrink: 0;
+  .marca svg { width: 21px; height: 21px; }
+  .topbar-info { flex: 1; min-width: 0; }
+  .topbar-title { font-size: 15px; font-weight: 600; line-height: 1.2; }
+  .topbar-sub { font-size: 12.5px; color: var(--texto-2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .chip {
+    font-size: 12px; font-weight: 500; color: var(--texto-2);
+    padding: 6px 11px; border-radius: 8px;
+    background: var(--suave); border: 1px solid var(--linea);
+    display: flex; align-items: center; gap: 7px; white-space: nowrap;
   }
-  .header-info { flex: 1; }
-  .header-title {
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.2px;
-    line-height: 1.2;
-  }
-  .header-sub {
-    color: rgba(255,255,255,0.6);
-    font-size: 11px;
-    font-weight: 400;
-    margin-top: 2px;
-    letter-spacing: 0.01em;
-  }
-  .header-right { display: flex; align-items: center; gap: 10px; }
-  .header-badge {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.9);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    backdrop-filter: blur(4px);
-  }
-  .badge-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #4ade80;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
-    50% { opacity:0.7; box-shadow: 0 0 0 4px rgba(74,222,128,0); }
-  }
-  .ficha-tag {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.7);
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-  }
+  .punto { width: 7px; height: 7px; border-radius: 50%; background: var(--vivo); }
 
-  /* ── LAYOUT ── */
-  .page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-width: 820px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 28px 18px 20px;
-    gap: 18px;
+  /* ── ESTRUCTURA DE LA APP ── */
+  .app {
+    flex: 1; width: 100%; max-width: 1200px; margin: 0 auto;
+    padding: 28px 28px 20px;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
   }
+  .principal { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .lateral   { grid-column: 1; grid-row: 1; position: sticky; top: 92px; display: flex; flex-direction: column; gap: 14px; }
 
-  /* ── HERO BANNER ── */
-  .hero {
-    background: linear-gradient(135deg, #002D1F 0%, #005C3F 100%);
+  /* ── TÍTULO ── */
+  .titulo h1 { color: var(--primario-2); font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -0.4px; }
+  .titulo p { margin-top: 6px; font-size: 15px; line-height: 1.55; color: var(--texto-2); max-width: 60ch; }
+
+  /* ── TARJETAS LATERALES ── */
+  .tarjeta {
+    background: var(--superficie);
+    border: 1px solid var(--linea);
+    border-radius: 14px;
+  }
+  .tarjeta-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 16px 18px 0;
+  }
+  .tarjeta-cab h2 { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+  .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--primario-tinte); display: grid; place-items: center; flex-shrink: 0; }
+  .ico svg { width: 16px; height: 16px; }
+  .summary-txt { display: flex; align-items: center; gap: 9px; }
+  .tarjeta-cab small { font-size: 12px; color: var(--texto-3); white-space: nowrap; }
+  .tarjeta-cab h2 { white-space: nowrap; }
+  .tarjeta-cuerpo { padding: 14px 18px 18px; }
+
+  /* fases */
+  .fases { list-style: none; position: relative; }
+  .fases::before { content: ''; position: absolute; left: 11px; top: 12px; bottom: 12px; width: 1.5px; background: var(--linea); }
+  .fase { position: relative; display: grid; grid-template-columns: 24px 1fr; gap: 12px; padding: 7px 0; }
+  .fase-punto {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--superficie); border: 1.5px solid var(--linea);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 600; color: var(--texto-3);
+    position: relative; z-index: 1;
+  }
+  .fase-nombre { font-size: 13.5px; font-weight: 500; color: var(--texto-2); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .fase-punto svg { width: 13px; height: 13px; }
+  .fase-fechas { font-size: 12px; color: var(--texto-3); margin-top: 1px; }
+  .fase-secciones { display: none; }
+  .fase-estado { font-size: 11px; font-weight: 500; color: var(--texto-3); white-space: nowrap; }
+
+  .fase.cerrada .fase-punto { background: var(--primario-tinte); border-color: var(--primario-tinte); color: var(--primario); }
+  .fase.activa .fase-punto { background: var(--primario); border-color: var(--primario); color: #fff; box-shadow: 0 0 0 4px var(--primario-tinte); }
+  .fase.activa .fase-nombre { color: var(--texto); font-weight: 600; }
+  .fase.activa .fase-estado { color: var(--primario); font-weight: 600; }
+  .fase.activa .fase-secciones {
+    display: block; margin-top: 8px;
+    font-size: 12.5px; line-height: 1.5; color: var(--texto-2);
+    background: var(--primario-tinte); border: 0; border-left: 3px solid var(--primario);
+    border-radius: 6px 9px 9px 6px; padding: 9px 11px;
+  }
+  .fase.activa .fase-secciones b { display: block; font-size: 11.5px; font-weight: 600; color: var(--texto); margin-bottom: 2px; }
+
+  /* desplegables */
+  details.tarjeta summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 15px 18px;
+    font-size: 14px; font-weight: 600;
+  }
+  details.tarjeta summary::-webkit-details-marker { display: none; }
+  details.tarjeta summary::after {
+    content: ''; width: 8px; height: 8px;
+    border-right: 1.5px solid var(--primario); border-bottom: 1.5px solid var(--primario);
+    transform: rotate(45deg); margin-top: -4px; transition: transform .2s;
+  }
+  details.tarjeta[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
+  details.tarjeta .tarjeta-cuerpo { padding-top: 0; }
+
+  .pasos { list-style: none; counter-reset: p; display: grid; gap: 10px; }
+  .pasos li {
+    counter-increment: p;
+    display: grid; grid-template-columns: 22px 1fr; gap: 10px;
+    font-size: 13px; line-height: 1.5; color: var(--texto-2);
+  }
+  .pasos li::before {
+    content: counter(p);
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--primario-tinte); border: 0;
+    font-size: 11px; font-weight: 600; color: var(--primario);
+    display: grid; place-items: center;
+  }
+  .pasos strong { color: var(--texto); font-weight: 600; }
+
+  .datos { display: grid; gap: 9px; font-size: 13px; }
+  .datos div { display: flex; justify-content: space-between; gap: 12px; }
+  .datos dt { color: var(--texto-2); }
+  .datos dd { font-weight: 500; text-align: right; }
+
+  /* ── CHAT ── */
+  .chat {
+    background: var(--superficie);
+    border: 1px solid var(--linea);
     border-radius: 18px;
-    padding: 28px 32px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    box-shadow: 0 4px 20px rgba(0,45,31,0.2);
-    position: relative;
+    box-shadow: 0 1px 2px rgba(27,42,38,0.04), 0 12px 32px -18px rgba(27,42,38,0.18);
+    display: flex; flex-direction: column;
+    height: calc(100vh - 230px);
+    height: calc(100dvh - 230px);
+    min-height: 480px;
     overflow: hidden;
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.04);
-    pointer-events: none;
+  .chat-top {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--linea);
+    background: linear-gradient(90deg, var(--primario-tinte), var(--superficie) 70%);
   }
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: 120px;
-    width: 160px; height: 160px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.03);
-    pointer-events: none;
+  .bot-av {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--primario);
+    display: grid; place-items: center; flex-shrink: 0; position: relative;
   }
-  .hero-icon {
-    width: 72px; height: 72px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 18px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36px;
-    flex-shrink: 0;
-    backdrop-filter: blur(4px);
+  .bot-av svg { width: 21px; height: 21px; }
+  .bot-av::after {
+    content: ''; position: absolute; right: -2px; bottom: -2px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--vivo); border: 2px solid var(--superficie);
   }
-  .hero-text { flex: 1; }
-  .hero-label {
-    color: rgba(255,255,255,0.55);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .hero-title {
-    color: white;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.25;
-    margin-bottom: 8px;
-    letter-spacing: -0.3px;
-  }
-  .hero-title span { color: #6ee7b7; }
-  .hero-desc {
-    color: rgba(255,255,255,0.6);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-  .hero-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-  .hero-step {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.75);
-  }
-  .hero-step-num {
-    width: 20px; height: 20px;
-    border-radius: 6px;
-    background: rgba(110,231,183,0.2);
-    border: 1px solid rgba(110,231,183,0.35);
-    color: #6ee7b7;
-    font-size: 10px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .chat-top-nombre { font-size: 14.5px; font-weight: 600; }
+  .chat-top-sub { font-size: 12.5px; color: var(--texto-2); }
 
-  /* ── CHAT CARD ── */
-  .chat-card {
-    background: white;
-    border-radius: 18px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    border: 1px solid #ddeee7;
-    display: flex;
-    flex-direction: column;
-    height: 500px;
-    overflow: hidden;
-  }
-  .chat-topbar {
-    background: #f7fdf9;
-    border-bottom: 1px solid #e2f0e9;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .chat-avatar-wrap {
-    position: relative;
-  }
-  .chat-avatar {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, #002D1F, #007A52);
-    border-radius: 11px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .chat-online {
-    position: absolute;
-    bottom: -2px; right: -2px;
-    width: 10px; height: 10px;
-    background: #22c55e;
-    border-radius: 50%;
-    border: 2px solid #f7fdf9;
-  }
-  .chat-topbar-info { flex: 1; }
-  .chat-topbar-name { font-size: 14px; font-weight: 600; color: #002D1F; }
-  .chat-topbar-sub { font-size: 11px; color: #6b9e85; margin-top: 1px; }
-  .chat-topbar-tag {
-    background: #f0faf5;
-    border: 1px solid #bbf7d0;
-    color: #005C3F;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
-
-  /* MESSAGES */
   .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    flex: 1; overflow-y: auto;
+    padding: 22px 22px;
+    display: flex; flex-direction: column; gap: 16px;
     scroll-behavior: smooth;
-    background: #fafffe;
+    background: var(--suave);
   }
-  .chat-messages::-webkit-scrollbar { width: 4px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: #c7e8d8; border-radius: 4px; }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--linea); border-radius: 6px; }
 
-  .msg { display: flex; gap: 10px; max-width: 82%; animation: fadeUp .22s ease-out; }
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(10px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
+  .msg { display: flex; gap: 10px; max-width: 78%; }
   .msg.bot { align-self: flex-start; }
   .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-
   .msg-av {
-    width: 30px; height: 30px;
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0; margin-top: 2px;
+    width: 28px; height: 28px; border-radius: 8px;
+    display: grid; place-items: center; flex-shrink: 0; margin-top: 2px;
   }
-  .msg.bot .msg-av { background: linear-gradient(135deg,#002D1F,#007A52); }
-  .msg.user .msg-av { background: linear-gradient(135deg,#1d4ed8,#3b82f6); }
-
-  .msg-content { display: flex; flex-direction: column; gap: 3px; }
+  .msg-av svg { width: 16px; height: 16px; }
+  .msg.bot .msg-av { background: var(--primario); }
+  .msg.user .msg-av { background: var(--primario-tinte); }
+  .msg-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .msg-bubble {
-    padding: 11px 15px;
-    border-radius: 15px;
-    font-size: 13.5px;
-    line-height: 1.58;
+    padding: 11px 15px; border-radius: 14px;
+    font-size: 14.5px; line-height: 1.6;
+    overflow-wrap: break-word;
   }
-  .msg.bot .msg-bubble {
-    background: white;
-    color: #1a2e27;
-    border: 1px solid #d1ead9;
-    border-bottom-left-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
-  .msg.user .msg-bubble {
-    background: linear-gradient(135deg,#003F2D,#007A52);
-    color: white;
-    border-bottom-right-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0,63,45,0.25);
-  }
-  .msg-time { font-size: 10px; color: #b0c4ba; padding: 0 3px; }
+  .msg.bot .msg-bubble { background: var(--superficie); border: 1px solid var(--linea); border-top-left-radius: 4px; }
+  .msg.user .msg-bubble { background: var(--primario); color: #fff; border-top-right-radius: 4px; }
+  .msg-bubble strong { font-weight: 600; }
+  .msg-time { font-size: 11px; color: var(--texto-3); padding: 0 4px; }
   .msg.user .msg-time { text-align: right; }
+  .nowrap { white-space: nowrap; }
 
-  /* TYPING */
-  .typing { display:none; align-items:center; gap:10px; max-width:82%; align-self:flex-start; }
-  .typing.on { display:flex; }
-  .typing-bub {
-    background: white;
-    border: 1px solid #d1ead9;
-    border-radius: 15px;
-    border-bottom-left-radius: 5px;
-    padding: 13px 16px;
-    display: flex; gap: 5px; align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
-  .td {
-    width: 7px; height: 7px;
-    background: #006B4A;
-    border-radius: 50%;
-    opacity: 0.4;
-    animation: td 1.2s infinite;
-  }
-  .td:nth-child(2){animation-delay:.2s}
-  .td:nth-child(3){animation-delay:.4s}
-  @keyframes td {
-    0%,100%{opacity:.4;transform:translateY(0)}
-    50%{opacity:1;transform:translateY(-4px)}
-  }
-
-  /* INPUT */
-  .chat-foot {
-    border-top: 1px solid #e2f0e9;
-    padding: 14px 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: #f7fdf9;
-  }
-  .chat-input {
-    flex: 1;
-    border: 1.5px solid #c8e6d4;
-    border-radius: 12px;
-    padding: 11px 16px;
-    font-size: 13.5px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    color: #1a2e27;
-    background: white;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  .chat-input:focus {
-    border-color: #005C3F;
-    box-shadow: 0 0 0 3px rgba(0,92,63,0.08);
-  }
-  .chat-input::placeholder { color: #a0b8ac; }
-  .chat-input:disabled { background:#f3f4f6; color:#9ca3af; }
-
-  .send-btn {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg,#003F2D,#007A52);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: opacity .2s, transform .12s, box-shadow .2s;
-    box-shadow: 0 2px 8px rgba(0,63,45,0.3);
-  }
-  .send-btn:hover { opacity:.9; transform:scale(1.05); box-shadow:0 4px 12px rgba(0,63,45,0.35); }
-  .send-btn:active { transform:scale(.96); }
-  .send-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
-  .send-btn svg { width:18px; height:18px; fill:white; }
-
-  .attach-btn {
-    width: 44px; height: 44px;
-    background: white;
-    border: 1.5px solid #c8e6d4;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: border-color .2s, background .2s;
-  }
-  .attach-btn:hover { background: #f0faf5; border-color: #005C3F; }
-  .attach-btn:disabled { opacity:.4; cursor:not-allowed; }
-  .attach-btn svg { width:18px; height:18px; fill:none; stroke:#005C3F; stroke-width:2; }
+  .typing { display: none; align-items: center; gap: 10px; align-self: flex-start; }
+  .typing.on { display: flex; }
+  .typing-bub { background: var(--superficie); border: 1px solid var(--linea); border-radius: 14px; border-top-left-radius: 4px; padding: 13px 15px; display: flex; gap: 5px; }
+  .td { width: 6px; height: 6px; border-radius: 50%; background: var(--primario); opacity: .3; animation: td 1.2s infinite; }
+  .td:nth-child(2) { animation-delay: .2s; }
+  .td:nth-child(3) { animation-delay: .4s; }
+  @keyframes td { 0%,100% { opacity:.3; transform:translateY(0); } 50% { opacity:.9; transform:translateY(-3px); } }
 
   .file-chip {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: #f0faf5;
-    border: 1px solid #bbf7d0;
-    border-radius: 10px;
-    padding: 8px 12px;
-    margin: 0 16px 10px;
-    font-size: 12.5px;
-    color: #005C3F;
+    display: none; align-items: center; gap: 8px;
+    margin: 0 14px 10px; padding: 8px 12px;
+    background: var(--primario-tinte); border-radius: 10px;
+    font-size: 13px; color: var(--primario);
   }
   .file-chip.on { display: flex; }
   .file-chip-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-  .file-chip-remove {
-    cursor: pointer;
-    color: #6b9e85;
-    font-weight: 700;
-    padding: 0 4px;
-  }
-  .file-chip-remove:hover { color: #dc2626; }
+  .file-chip-remove { cursor: pointer; padding: 0 6px; color: var(--texto-2); }
+  .file-chip-remove:hover { color: #B42318; }
 
-  /* INFO PILLS */
-  .info-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  .chat-foot {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--linea);
+    background: var(--superficie);
   }
-  .info-pill {
-    flex: 1;
-    min-width: 180px;
-    background: white;
-    border: 1px solid #ddeee7;
-    border-radius: 12px;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  .chat-input {
+    flex: 1; min-width: 0;
+    border: 1px solid var(--linea); border-radius: 12px;
+    padding: 12px 15px;
+    font: inherit; font-size: 15px; color: var(--texto);
+    background: var(--suave); outline: none;
+    transition: border-color .2s, background .2s;
   }
-  .pill-icon {
-    width: 36px; height: 36px;
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .pill-label { font-size: 11px; color: #6b9e85; font-weight: 500; margin-bottom: 2px; }
-  .pill-value { font-size: 13px; color: #002D1F; font-weight: 600; }
+  .chat-input:focus { border-color: var(--primario); background: var(--superficie); }
+  .chat-input::placeholder { color: var(--texto-3); }
+  .chat-input:disabled { opacity: .6; }
 
-  /* FOOTER */
-  .footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 11px;
-    color: #9fb5ab;
-    line-height: 1.7;
+  .attach-btn, .send-btn {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center; flex-shrink: 0;
+    cursor: pointer; border: none;
+    transition: background .2s, transform .1s;
   }
-  .footer strong { color: #005C3F; }
+  .attach-btn { background: transparent; border: 1px solid var(--linea); }
+  .attach-btn:hover { background: var(--primario-tinte); border-color: var(--primario); }
+  .attach-btn svg { width: 19px; height: 19px; }
+  .send-btn { background: var(--primario); }
+  .send-btn:hover { background: var(--primario-2); }
+  .send-btn:active { transform: scale(.96); }
+  .send-btn svg { width: 19px; height: 19px; }
+  .attach-btn:disabled, .send-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .footer { text-align: center; padding: 16px 16px 24px; font-size: 12px; color: var(--texto-3); line-height: 1.7; }
+
+  /* ── TABLET ── */
+  @media (max-width: 900px) {
+    .topbar-inner { padding: 0 16px; }
+    .app { grid-template-columns: 1fr; padding: 22px 16px 14px; gap: 18px; }
+    .principal, .lateral { grid-column: 1; grid-row: auto; }
+    .lateral { position: static; }
+    .chat { height: 70vh; height: 70dvh; min-height: 440px; }
+  }
+
+  /* ── CELULAR ── */
+  @media (max-width: 600px) {
+    .topbar { padding: 10px 0; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+    .topbar-inner { padding: 0 14px; }
+    .marca { width: 34px; height: 34px; border-radius: 10px; }
+    .marca svg { width: 19px; height: 19px; }
+    .topbar-title { font-size: 14px; }
+    .topbar-sub, .chip.ficha { display: none; }
+
+    .app { padding: 16px 10px 10px; gap: 14px; }
+    .titulo { padding: 0 4px; }
+    .titulo h1 { font-size: 22px; }
+    .titulo p { font-size: 14px; }
+
+    .chat { border-radius: 16px; height: 72vh; height: 72dvh; min-height: 420px; }
+    .chat-top { padding: 12px 14px; }
+    .chat-messages { padding: 16px 12px; }
+    .msg { max-width: 92%; }
+    .chat-foot { padding: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); gap: 8px; }
+    .chat-input { font-size: 16px; padding: 11px 12px; }
+    .attach-btn, .send-btn { width: 42px; height: 42px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-logo">🎓</div>
-  <div class="header-divider"></div>
-  <div class="header-info">
-    <div class="header-title">Asistente de Proyecto Formativo</div>
-    <div class="header-sub">Centro de la Innovación, la Agroindustria y la Aviación · Rionegro</div>
-  </div>
-  <div class="header-right">
-    <div class="ficha-tag">FICHA 3409974</div>
-    <div class="header-badge"><div class="badge-dot"></div>En línea</div>
-  </div>
-</div>
-
-<!-- PAGE -->
-<div class="page">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-icon">🤖</div>
-    <div class="hero-text">
-      <div class="hero-label">Inteligencia Artificial · SENA</div>
-      <div class="hero-title">Tu guía inteligente para el<br><span>proyecto formativo</span></div>
-      <div class="hero-desc">Verifica tu acceso, consulta tus fases y sube entregables con retroalimentación instantánea.</div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="marca" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
     </div>
-    <div class="hero-steps">
-      <div class="hero-step"><div class="hero-step-num">1</div>Ingresa tu documento</div>
-      <div class="hero-step"><div class="hero-step-num">2</div>Accede a tu grupo</div>
-      <div class="hero-step"><div class="hero-step-num">3</div>Sube tu entregable</div>
-      <div class="hero-step"><div class="hero-step-num">4</div>Recibe feedback al instante</div>
+    <div class="topbar-info">
+      <div class="topbar-title">Asistente de Proyecto Formativo</div>
+      <div class="topbar-sub">SENA · Centro de la Innovación, la Agroindustria y la Aviación · Rionegro</div>
+    </div>
+    <div class="topbar-right">
+      <div class="chip ficha">Ficha 3409974</div>
+      <div class="chip"><span class="punto"></span>En línea</div>
     </div>
   </div>
+</header>
 
-  <!-- INFO PILLS -->
-  <div class="info-row">
-    <div class="info-pill">
-      <div class="pill-icon" style="background:#f0fdf4;">📚</div>
-      <div>
-        <div class="pill-label">Programa</div>
-        <div class="pill-value">TGO en Gestión Administrativa</div>
-      </div>
-    </div>
-    <div class="info-pill">
-      <div class="pill-icon" style="background:#eff6ff;">📅</div>
-      <div>
-        <div class="pill-label">Etapa lectiva</div>
-        <div class="pill-value">09/02/2026 → 08/02/2027</div>
-      </div>
-    </div>
-    <div class="info-pill">
-      <div class="pill-icon" style="background:#fefce8;">⚡</div>
-      <div>
-        <div class="pill-label">Fase actual</div>
-        <div class="pill-value">Fase 1 · Análisis</div>
-      </div>
-    </div>
-  </div>
+<div class="app">
 
-  <!-- CHAT -->
-  <div class="chat-card">
-    <div class="chat-topbar">
-      <div class="chat-avatar-wrap">
-        <div class="chat-avatar">🤖</div>
-        <div class="chat-online"></div>
-      </div>
-      <div class="chat-topbar-info">
-        <div class="chat-topbar-name">Asistente SENA</div>
-        <div class="chat-topbar-sub">Responde en segundos · Disponible 24/7</div>
-      </div>
-      <div class="chat-topbar-tag">IA ACTIVA</div>
-    </div>
+  <main class="principal">
+    <section class="titulo">
+      <h1>Tu guía inteligente para el proyecto formativo</h1>
+      <p>Verifica tu acceso, consulta tus fases y sube entregables con retroalimentación instantánea.</p>
+    </section>
 
-    <div class="chat-messages" id="messages">
-      <div class="msg bot">
-        <div class="msg-av">🤖</div>
-        <div class="msg-content">
-          <div class="msg-bubble">¡Hola! 👋 Bienvenido al Asistente de Proyecto Formativo del <strong>SENA</strong>.<br><br>Estoy aquí para ayudarte a gestionar tu avance por fases, verificar tus entregables y darte retroalimentación inmediata.<br><br>Para comenzar, ingresa tu <strong>número de documento</strong> de identidad.</div>
-          <div class="msg-time">Ahora · Asistente SENA</div>
+    <section class="chat" aria-label="Chat con el asistente">
+      <div class="chat-top">
+        <div class="bot-av" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
         </div>
-      </div>
-      <div class="msg bot">
-        <div class="msg-av">🤖</div>
-        <div class="msg-content">
-          <div class="msg-bubble">📌 <strong>Formato esperado:</strong><br>TI-1109922036 &nbsp;·&nbsp; CC-1036933859</div>
-          <div class="msg-time">Ahora · Asistente SENA</div>
+        <div>
+          <div class="chat-top-nombre">Asistente SENA</div>
+          <div class="chat-top-sub">Revisa tus entregables en segundos</div>
         </div>
       </div>
 
-      <div class="typing" id="typing">
-        <div class="msg-av" style="background:linear-gradient(135deg,#002D1F,#007A52);width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🤖</div>
-        <div class="typing-bub">
-          <div class="td"></div><div class="td"></div><div class="td"></div>
+      <div class="chat-messages" id="messages">
+        <div class="msg bot">
+          <div class="msg-av">BOT_ICON</div>
+          <div class="msg-content">
+            <div class="msg-bubble">¡Hola! 👋 Bienvenido al Asistente de Proyecto Formativo del <strong>SENA</strong>.<br><br>Estoy aquí para ayudarte a gestionar tu avance por fases, verificar tus entregables y darte retroalimentación inmediata.<br><br>Para comenzar, ingresa tu <strong>número de documento</strong> de identidad.</div>
+            <div class="msg-time">Ahora · Asistente SENA</div>
+          </div>
+        </div>
+        <div class="msg bot">
+          <div class="msg-av">BOT_ICON</div>
+          <div class="msg-content">
+            <div class="msg-bubble"><strong>Formato esperado:</strong><br><span class="nowrap">TI-1109922036</span> &nbsp;o&nbsp; <span class="nowrap">CC-1036933859</span></div>
+            <div class="msg-time">Ahora · Asistente SENA</div>
+          </div>
+        </div>
+
+        <div class="typing" id="typing">
+          <div class="msg-av" style="background:#1F5C45;">BOT_ICON</div>
+          <div class="typing-bub"><div class="td"></div><div class="td"></div><div class="td"></div></div>
         </div>
       </div>
-    </div>
 
-    <div class="file-chip" id="fileChip">
-      <span>📎</span>
-      <span class="file-chip-name" id="fileChipName"></span>
-      <span class="file-chip-remove" id="fileChipRemove">✕</span>
-    </div>
-    <div class="chat-foot">
-      <input type="file" id="fileInput" accept=".doc,.docx,.pdf" style="display:none" />
-      <button class="attach-btn" id="attachBtn" title="Adjuntar Word o PDF">
-        <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-      </button>
-      <input type="text" class="chat-input" id="chatInput"
-        placeholder="Ej: TI-1109922036 o CC-1036933859" autocomplete="off"/>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
-  </div>
+      <div class="file-chip" id="fileChip">
+        <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></svg>
+        <span class="file-chip-name" id="fileChipName"></span>
+        <span class="file-chip-remove" id="fileChipRemove" role="button" aria-label="Quitar archivo">✕</span>
+      </div>
+      <div class="chat-foot">
+        <input type="file" id="fileInput" accept=".pdf,application/pdf" style="display:none" />
+        <button class="attach-btn" id="attachBtn" title="Adjuntar PDF" aria-label="Adjuntar PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg>
+        </button>
+        <input type="text" class="chat-input" id="chatInput" placeholder="Escribe aquí…" autocomplete="off" aria-label="Mensaje"/>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <aside class="lateral">
+    <section class="tarjeta">
+      <div class="tarjeta-cab"><h2><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg></span>Fases del proyecto</h2><small id="hoy"></small></div>
+      <div class="tarjeta-cuerpo"><ol class="fases" id="fases"></ol></div>
+    </section>
+
+    <details class="tarjeta">
+      <summary><span class="summary-txt"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg></span>Cómo entregar</span></summary>
+      <div class="tarjeta-cuerpo">
+        <ol class="pasos">
+          <li><span><strong>Escribe tu documento</strong> para verificar tu acceso.</span></li>
+          <li><span><strong>Adjunta tu PDF</strong> con el clip y envíalo.</span></li>
+          <li><span><strong>Lee la retroalimentación:</strong> tu nota de coherencia y qué mejorar.</span></li>
+          <li><span><strong>El líder hace la entrega oficial.</strong> Con 70% o más, el grupo avanza de fase.</span></li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="tarjeta">
+      <summary><span class="summary-txt"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span>Tu programa</span></summary>
+      <div class="tarjeta-cuerpo">
+        <dl class="datos">
+          <div><dt>Programa</dt><dd>TGO en Gestión Administrativa</dd></div>
+          <div><dt>Ficha</dt><dd>3409974</dd></div>
+          <div><dt>Etapa lectiva</dt><dd>09/02/2026 – 08/02/2027</dd></div>
+          <div><dt>Centro</dt><dd>Rionegro, Antioquia</dd></div>
+        </dl>
+      </div>
+    </details>
+  </aside>
 
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-  <strong>SENA · Centro de la Innovación, la Agroindustria y la Aviación</strong><br>
+<footer class="footer">
+  SENA · Centro de la Innovación, la Agroindustria y la Aviación<br>
   Ficha 3409974 · TGO en Gestión Administrativa · Rionegro, Antioquia
-</div>
+</footer>
 
 <script>
   const WEBHOOK_URL = 'https://botsena.app.n8n.cloud/webhook/424952af-b5f9-4a46-bfec-700c8d5956bb/chat';
 
+  const ICONO_BOT = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
+  const ICONO_USUARIO = '<svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>';
+  document.querySelectorAll('.msg-av').forEach(el => { if (el.textContent.trim() === 'BOT_ICON') el.innerHTML = ICONO_BOT; });
+
+  const ICONO_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#1F5C45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  /* ── CALENDARIO DE FASES ──
+     Cambia estas fechas cuando el instructor confirme las de cada trimestre.
+     Formato: año-mes-día */
+  const FASES = [
+    { n: 1, nombre: 'Análisis',   inicio: '2026-02-09', fin: '2026-05-11', secciones: 'Diagnóstico, planteamiento del problema y objetivos' },
+    { n: 2, nombre: 'Planeación', inicio: '2026-05-12', fin: '2026-08-11', secciones: 'Marco teórico, marco contextual y antecedentes' },
+    { n: 3, nombre: 'Ejecución',  inicio: '2026-08-12', fin: '2026-12-17', secciones: 'Marco conceptual, plan de acción y justificación' },
+    { n: 4, nombre: 'Evaluación', inicio: '2026-12-18', fin: '2027-02-08', secciones: 'Introducción, conclusiones y recomendaciones' },
+  ];
+
+  function pintarFases() {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+    document.getElementById('fases').innerHTML = FASES.map(f => {
+      const ini = new Date(f.inicio + 'T00:00:00');
+      const fin = new Date(f.fin + 'T00:00:00');
+      const estado = hoy > fin ? 'cerrada' : (hoy >= ini ? 'activa' : 'proxima');
+      const texto = { cerrada: 'Cerrada', activa: 'En curso', proxima: 'Próxima' }[estado];
+      return `
+        <li class="fase ${estado}">
+          <div class="fase-punto">${estado === 'cerrada' ? ICONO_CHECK : f.n}</div>
+          <div>
+            <div class="fase-nombre"><span>Fase ${f.n} · ${f.nombre}</span><span class="fase-estado">${texto}</span></div>
+            <div class="fase-fechas">${fmt(f.inicio)} – ${fmt(f.fin)}</div>
+            <div class="fase-secciones"><b>Qué se entrega</b>${f.secciones}</div>
+          </div>
+        </li>`;
+    }).join('');
+    document.getElementById('hoy').textContent = 'Hoy, ' + hoy.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+  }
+  pintarFases();
+
+  /* ── CHAT ── */
   const messagesEl     = document.getElementById('messages');
   const inputEl        = document.getElementById('chatInput');
   const sendBtn        = document.getElementById('sendBtn');
@@ -612,17 +517,14 @@
 
   function mdToHtml(text) {
     let safe = escapeHtml(text);
-    // negrita: **texto**
     safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // cursiva: *texto* (una sola asterisco, sin chocar con la negrita ya reemplazada)
     safe = safe.replace(/(^|[^*])\*([^*]+?)\*($|[^*])/g, '$1<em>$2</em>$3');
-    // listas con guion al inicio de línea
     safe = safe.replace(/\n- (.+)/g, '\n• $1');
     return safe.replace(/\n/g, '<br>');
   }
 
   function addMessage(text, type) {
-    const av  = type === 'bot' ? '🤖' : '👤';
+    const av  = type === 'bot' ? ICONO_BOT : ICONO_USUARIO;
     const who = type === 'bot' ? 'Asistente SENA' : 'Tú';
     const div = document.createElement('div');
     div.className = `msg ${type}`;
@@ -661,7 +563,6 @@
     try {
       let res;
       if (fileToSend) {
-        // Con archivo adjunto: n8n espera multipart/form-data (mismo formato que usa el widget oficial de n8n)
         const formData = new FormData();
         formData.append('action', 'sendMessage');
         formData.append('chatInput', text || 'Adjunto mi entregable');
@@ -669,7 +570,6 @@
         formData.append('files', fileToSend, fileToSend.name);
         res = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
       } else {
-        // Solo texto: se mantiene igual que antes
         res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -682,7 +582,7 @@
       addMessage(reply, 'bot');
     } catch(e) {
       setTyping(false);
-      addMessage('⚠️ Error de conexión. Verifica tu internet e intenta de nuevo.', 'bot');
+      addMessage('⚠️ No se pudo conectar con el asistente. Revisa tu internet e intenta de nuevo.', 'bot');
     }
     inputEl.disabled = false;
     sendBtn.disabled = false;
