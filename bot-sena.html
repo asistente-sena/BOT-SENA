@@ -698,15 +698,61 @@
 <script>
   const WEBHOOK_URL = 'https://n8n-production-fbacf.up.railway.app/webhook/424952af-b5f9-4a46-bfec-700c8d5956bb/chat';
 
-  /* ── CALENDARIO DE FASES ──
-     Cambia estas fechas cuando el instructor confirme las de cada trimestre.
-     Formato: año-mes-día */
-  const FASES = [
-    { n: 1, nombre: 'Análisis',   inicio: '2026-02-09', fin: '2026-05-11', secciones: 'Diagnóstico, planteamiento del problema y objetivos' },
-    { n: 2, nombre: 'Planeación', inicio: '2026-05-12', fin: '2026-08-11', secciones: 'Marco teórico, marco contextual y antecedentes' },
-    { n: 3, nombre: 'Ejecución',  inicio: '2026-08-12', fin: '2026-12-17', secciones: 'Marco conceptual, plan de acción y justificación' },
-    { n: 4, nombre: 'Evaluación', inicio: '2026-12-18', fin: '2027-02-08', secciones: 'Introducción, conclusiones y recomendaciones' },
+    /* ── CALENDARIO DE FASES ──
+     Las fechas se leen de la pestaña "FASES Y FECHAS" de la hoja (publicada como CSV).
+     Si la hoja no responde, se usan estas fechas de respaldo. Formato: año-mes-día */
+  const FASES_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRfaJyWTn0PgVpWIlNpnmVLOe1GnhIwJYycXKQtj2k87fgP-xaM4GLZnZNFgfzKVb_mU3LbiwtuSxP-/pub?gid=1607658024&single=true&output=csv';
+  let FASES = [
+    { n: 1, nombre: 'Análisis',   inicio: '2026-01-29', fin: '2026-04-14', secciones: 'Diagnóstico, planteamiento del problema y objetivos' },
+    { n: 2, nombre: 'Planeación', inicio: '2026-04-20', fin: '2026-07-04', secciones: 'Marco teórico, marco contextual y antecedentes' },
+    { n: 3, nombre: 'Ejecución',  inicio: '2026-07-09', fin: '2026-09-25', secciones: 'Marco conceptual, plan de acción y justificación' },
+    { n: 4, nombre: 'Evaluación', inicio: '2026-09-29', fin: '2026-12-04', secciones: 'Introducción, conclusiones y recomendaciones' },
   ];
+
+  // Convierte el texto CSV en una tabla (respeta las comas dentro de comillas)
+  function leerCSV(texto) {
+    const filas = []; let fila = [], celda = '', comillas = false;
+    for (let i = 0; i < texto.length; i++) {
+      const c = texto[i];
+      if (comillas) {
+        if (c === '"' && texto[i + 1] === '"') { celda += '"'; i++; }
+        else if (c === '"') comillas = false;
+        else celda += c;
+      } else if (c === '"') comillas = true;
+      else if (c === ',') { fila.push(celda); celda = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && texto[i + 1] === '\n') i++;
+        fila.push(celda); filas.push(fila); fila = []; celda = '';
+      } else celda += c;
+    }
+    if (celda || fila.length) { fila.push(celda); filas.push(fila); }
+    return filas;
+  }
+
+  // "29/09/2026" → "2026-09-29"
+  const aISO = f => { const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : null; };
+
+  async function cargarFases() {
+    try {
+      const res = await fetch(FASES_CSV, { cache: 'no-store' });
+      const filas = leerCSV(await res.text());
+      const enc = filas.findIndex(f => String(f[0]).trim().toUpperCase() === 'FASE');
+      if (enc < 0) return;
+      const col = nombre => filas[enc].findIndex(h => String(h).trim().toUpperCase() === nombre);
+      const cN = col('NOMBRE'), cI = col('FECHA INICIO'), cF = col('FECHA LÍMITE'), cS = col('SECCIONES A ENTREGAR');
+      const nuevas = filas.slice(enc + 1)
+        .filter(f => /^fase\s*\d/i.test(String(f[0]).trim()))
+        .map(f => ({
+          n: Number(String(f[0]).replace(/\D/g, '')),
+          nombre: f[cN], inicio: aISO(f[cI]), fin: aISO(f[cF]), secciones: f[cS],
+        }))
+        .filter(f => f.inicio && f.fin);
+      if (nuevas.length) { FASES = nuevas; pintarFases(); }
+    } catch (e) {
+      console.warn('No se pudieron leer las fechas de la hoja; se usan las de respaldo.', e);
+    }
+  }
+  cargarFases();
 
   const ICONO_BOT = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
   const ICONO_USUARIO = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>';
