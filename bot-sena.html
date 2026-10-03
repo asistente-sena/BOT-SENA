@@ -775,12 +775,14 @@
       const fin = new Date(f.fin + 'T00:00:00');
       const estado = hoy > fin ? 'cerrada' : (hoy >= ini ? 'activa' : 'proxima');
       const texto = { cerrada: 'Cerrada', activa: 'En curso', proxima: 'Próxima' }[estado];
+            const dias = Math.round((fin - hoy) / 86400000);
       return `
         <li class="fase ${estado}">
           <div class="fase-punto">${estado === 'cerrada' ? ICONO_CHECK : f.n}</div>
           <div>
             <div class="fase-nombre"><span>Fase ${f.n} · ${f.nombre}</span><span class="fase-estado">${texto}</span></div>
             <div class="fase-fechas">${fmt(f.inicio)} – ${fmt(f.fin)}</div>
+                        ${estado === 'activa' ? `<div style="font-size:12px;font-weight:600;color:var(--tinte-texto);margin-top:2px">⏳ ${dias === 0 ? 'Hoy es la fecha límite' : dias === 1 ? 'Queda 1 día' : 'Quedan ' + dias + ' días'}</div>` : ''}
             <div class="fase-secciones"><b>Qué se entrega</b>${f.secciones}</div>
           </div>
         </li>`;
