@@ -892,6 +892,8 @@
 
   function entrarALaApp(data, textoBienvenida) {
     pintarPerfil(data);
+        const esInstructor = String(data.rol || '').toUpperCase() === 'INSTRUCTOR';
+    document.querySelectorAll('.rapida').forEach(b => { b.hidden = b.hasAttribute('data-instructor') ? !esInstructor : esInstructor; });
     messagesEl.querySelectorAll('.msg').forEach(m => m.remove());
     addMessage(textoBienvenida, 'bot');
     pantallaIngreso.hidden = true;
@@ -937,6 +939,7 @@
 
   rapidas.forEach(b => b.addEventListener('click', () => {
     if (b.hasAttribute('data-subir')) { fileInputEl.click(); return; }
+        if (b.dataset.plantilla) { inputEl.value = b.dataset.plantilla; inputEl.focus(); return; }
     inputEl.value = b.dataset.pregunta;
     sendMessage();
   }));
