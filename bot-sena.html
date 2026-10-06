@@ -885,6 +885,7 @@
     if (data.grupo)    datos.push(['Grupo', data.grupo]);
     if (data.fase)     datos.push(['Fase', 'Fase ' + String(data.fase).replace(/fase\s*/i, '')]);
     if (data.rol)      datos.push(['Rol', data.rol.charAt(0) + data.rol.slice(1).toLowerCase()]);
+        if (data.aviso)    datos.push(['⚠️ Entrega rechazada — corrige y vuelve a subir', data.aviso, true]);
     if (!datos.length) datos.push(['Documento', documentoActual, true]);
     document.getElementById('perfilDatos').innerHTML = datos.map(([k, v, ancho]) =>
       `<div class="perfil-dato${ancho ? ' ancho' : ''}"><small>${k}</small><b>${escapeHtml(v)}</b></div>`).join('');
