@@ -682,6 +682,7 @@
           <button type="button" class="rapida" data-pregunta="¿Cómo va mi última entrega?">¿Cómo va mi entrega?</button>
                     <button type="button" class="rapida" data-plantilla="Mensaje para el profe: ">✉️ Mensaje al profe</button>
                     <button type="button" class="rapida" data-pregunta="Ver avisos anteriores">📢 Avisos anteriores</button>
+                    <button type="button" class="rapida" data-pregunta="Ver mi historial de entregas">🗂️ Mi historial</button>
                     <button type="button" class="rapida" data-instructor hidden data-pregunta="Muéstrame el resumen de entregas">📊 Resumen de entregas</button>
           <button type="button" class="rapida" data-instructor hidden data-plantilla="¿Cómo va el grupo G">📁 Consultar grupo</button>
           <button type="button" class="rapida" data-instructor hidden data-plantilla="Pasa el grupo G">🔄 Cambiar fase</button>
@@ -819,6 +820,7 @@
   function escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function mdToHtml(text) {
     let safe = escapeHtml(text);
+        safe = safe.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:600">Abrir enlace</a>');
     safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     safe = safe.replace(/(^|[^*])\*([^*]+?)\*($|[^*])/g, '$1<em>$2</em>$3');
     safe = safe.replace(/\n- (.+)/g, '\n• $1');
