@@ -958,6 +958,7 @@
   rapidas.forEach(b => b.addEventListener('click', () => {
         if (b.hasAttribute('data-subir')) { if (inputEl.value.trim().toUpperCase() === 'BORRADOR') inputEl.value = ''; fileInputEl.click(); return; }
     if (b.hasAttribute('data-borrador')) { inputEl.value = 'BORRADOR'; fileInputEl.click(); return; }
+        if (b.dataset.plantilla) { inputEl.value = b.dataset.plantilla; inputEl.focus(); return; }
     inputEl.value = b.dataset.pregunta;
     sendMessage();
   }));
