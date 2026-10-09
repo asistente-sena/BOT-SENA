@@ -756,6 +756,18 @@
   // "29/09/2026" → "2026-09-29"
   const aISO = f => { const m = String(f).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : null; };
 
+    let FASES_TODAS = [];   // fases de todas las fichas, leídas de la hoja
+  let fichaActual = '';   // ficha de la persona que entró
+
+  // Muestra solo las fases de la ficha de la persona (si la hoja tiene esa ficha)
+  function usarFicha(ficha) {
+    if (ficha !== undefined) fichaActual = String(ficha ?? '').trim();
+    if (!FASES_TODAS.length) return;
+    const propias = fichaActual ? FASES_TODAS.filter(f => f.ficha === fichaActual) : [];
+    const lista = propias.length ? propias : FASES_TODAS.filter(f => f.ficha === FASES_TODAS[0].ficha);
+    if (lista.length) { FASES = lista; pintarFases(); }
+  }
+
   async function cargarFases() {
     try {
       const res = await fetch(FASES_CSV, { cache: 'no-store' });
@@ -763,15 +775,16 @@
       const enc = filas.findIndex(f => String(f[0]).trim().toUpperCase() === 'FASE');
       if (enc < 0) return;
       const col = nombre => filas[enc].findIndex(h => String(h).trim().toUpperCase() === nombre);
-      const cN = col('NOMBRE'), cI = col('FECHA INICIO'), cF = col('FECHA LÍMITE'), cS = col('SECCIONES A ENTREGAR');
-      const nuevas = filas.slice(enc + 1)
+      const cN = col('NOMBRE'), cI = col('FECHA INICIO'), cF = col('FECHA LÍMITE'), cS = col('SECCIONES A ENTREGAR'), cFi = col('FICHA');
+      FASES_TODAS = filas.slice(enc + 1)
         .filter(f => /^fase\s*\d/i.test(String(f[0]).trim()))
         .map(f => ({
           n: Number(String(f[0]).replace(/\D/g, '')),
           nombre: f[cN], inicio: aISO(f[cI]), fin: aISO(f[cF]), secciones: f[cS],
+          ficha: cFi >= 0 ? String(f[cFi] ?? '').trim() : '',
         }))
         .filter(f => f.inicio && f.fin);
-      if (nuevas.length) { FASES = nuevas; pintarFases(); }
+      usarFicha();
     } catch (e) {
       console.warn('No se pudieron leer las fechas de la hoja; se usan las de respaldo.', e);
     }
@@ -945,6 +958,7 @@
 
   function entrarALaApp(data, textoBienvenida) {
     pintarPerfil(data);
+        usarFicha(data.ficha);
         const esInstructor = String(data.rol || '').toUpperCase() === 'INSTRUCTOR';
     document.querySelectorAll('.rapida').forEach(b => { b.hidden = b.hasAttribute('data-instructor') ? !esInstructor : esInstructor; });
     messagesEl.querySelectorAll('.msg').forEach(m => m.remove());
