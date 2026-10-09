@@ -866,26 +866,61 @@
 
   function mostrarAviso(t) { avisoIngreso.textContent = t; avisoIngreso.hidden = false; }
 
+    let esperandoCodigo = false;
+
+  // Cambia el formulario para pedir el código que llegó al correo
+  function modoCodigo(texto) {
+    esperandoCodigo = true;
+    numeroDoc.value = '';
+    numeroDoc.placeholder = 'Código de 6 números';
+    numeroDoc.maxLength = 6;
+    document.querySelectorAll('.tipo').forEach(b => b.disabled = true);
+    btnIngresar.dataset.texto = 'Entrar';
+    mostrarAviso(texto.replace(/\*\*/g, ''));
+    numeroDoc.focus();
+  }
+
+  // Devuelve el formulario a pedir el documento
+  function modoDocumento() {
+    esperandoCodigo = false;
+    numeroDoc.value = '';
+    numeroDoc.placeholder = 'Solo números, sin puntos';
+    numeroDoc.removeAttribute('maxlength');
+    document.querySelectorAll('.tipo').forEach(b => b.disabled = false);
+    btnIngresar.dataset.texto = 'Ingresar';
+  }
+
   formIngreso.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const numero = numeroDoc.value.trim();
-    if (numero.length < 5) { mostrarAviso('Escribe tu número de documento completo, solo con números.'); numeroDoc.focus(); return; }
-    documentoActual = `${tipoDoc}-${numero}`;
+    const valor = numeroDoc.value.trim();
+
+    if (!esperandoCodigo) {
+      if (valor.length < 5) { mostrarAviso('Escribe tu número de documento completo, solo con números.'); numeroDoc.focus(); return; }
+      documentoActual = `${tipoDoc}-${valor}`;
+    } else if (!/^\d{6}$/.test(valor)) {
+      mostrarAviso('Escribe el código de 6 números que te llegó al correo.'); numeroDoc.focus(); return;
+    }
 
     btnIngresar.disabled = true;
     btnIngresar.innerHTML = '<span class="giro"></span> Verificando…';
     try {
-      const { data, texto } = await hablarConBot(documentoActual);
+      const { data, texto } = await hablarConBot(esperandoCodigo ? valor : documentoActual);
       if (/acceso denegado|no registrado/i.test(texto)) {
         mostrarAviso('No encontramos ese documento en la ficha. Revisa el tipo y el número, e intenta de nuevo.');
-      } else {
+      } else if (data.pideCodigo) {
+        modoCodigo(texto);
+      } else if (data.rol || data.nombre) {
+        modoDocumento();
         entrarALaApp(data, texto);
+      } else {
+        mostrarAviso(texto.replace(/\*\*/g, ''));
+        if (/escribe de nuevo tu número de documento/i.test(texto)) modoDocumento();
       }
     } catch (err) {
       mostrarAviso('No se pudo conectar con el asistente. Revisa tu internet e intenta de nuevo.');
     }
     btnIngresar.disabled = false;
-    btnIngresar.textContent = 'Ingresar';
+    btnIngresar.textContent = btnIngresar.dataset.texto || 'Ingresar';
   });
 
   /* Perfil: usa los datos que envíe n8n (nombre, rol, proyecto, grupo, fase).
