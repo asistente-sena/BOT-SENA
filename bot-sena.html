@@ -577,9 +577,16 @@
         <input class="numero" id="numeroDoc" type="text" inputmode="numeric" autocomplete="off" placeholder="Solo números, sin puntos" />
       </div>
 
+      <label id="filaRecordar" style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;color:var(--texto-2);cursor:pointer">
+        <input type="checkbox" id="recordarEquipo" style="width:18px;height:18px;margin-top:1px;accent-color:var(--tinte-texto);flex-shrink:0" />
+        <span>Recordar este equipo por 30 días<br><small style="opacity:.8">No lo marques en computadores compartidos o del SENA.</small></span>
+      </label>
+
       <div class="aviso" id="avisoIngreso" role="alert" hidden></div>
 
       <button class="btn-principal" id="btnIngresar" type="submit">Ingresar</button>
+
+      <button type="button" id="btnOlvidar" hidden style="background:none;border:0;padding:0;color:var(--tinte-texto);font-size:13px;text-decoration:underline;cursor:pointer;justify-self:start;align-self:flex-start">Olvidar los equipos recordados en este navegador</button>
 
       <p class="pie-ingreso">Ficha 3409974, TGO en Gestión Administrativa, Rionegro, Antioquia.</p>
     </form>
@@ -904,6 +911,22 @@
     btnIngresar.dataset.texto = 'Ingresar';
   }
 
+  /* ── RECORDAR ESTE EQUIPO (30 días) ──
+     Guarda en este navegador la llave que entrega el bot, para no pedir código cada vez. */
+  const recordarEquipo = document.getElementById('recordarEquipo');
+  const btnOlvidar     = document.getElementById('btnOlvidar');
+  function leerLlaves() { try { return JSON.parse(localStorage.getItem('llavesBot') || '{}'); } catch (e) { return {}; } }
+  function guardarLlaves(l) { try { localStorage.setItem('llavesBot', JSON.stringify(l)); } catch (e) {} mostrarOlvidar(); }
+  function llaveDe(doc) { const l = leerLlaves()[doc]; return l && l.vence > Date.now() ? l.token : ''; }
+  function guardarLlave(doc, token) { const l = leerLlaves(); l[doc] = { token, vence: Date.now() + 30 * 24 * 60 * 60 * 1000 }; guardarLlaves(l); }
+  function borrarLlave(doc) { const l = leerLlaves(); delete l[doc]; guardarLlaves(l); }
+  function mostrarOlvidar() { btnOlvidar.hidden = !Object.keys(leerLlaves()).length; }
+  btnOlvidar.addEventListener('click', () => {
+    guardarLlaves({});
+    mostrarAviso('Listo. Este navegador ya no recuerda ningún equipo: la próxima vez se pedirá el código.');
+  });
+  mostrarOlvidar();
+
   formIngreso.addEventListener('submit', async (e) => {
     e.preventDefault();
     const valor = numeroDoc.value.trim();
@@ -918,12 +941,24 @@
     btnIngresar.disabled = true;
     btnIngresar.innerHTML = '<span class="giro"></span> Verificando…';
     try {
-      const { data, texto } = await hablarConBot(esperandoCodigo ? valor : documentoActual);
+      // Si este equipo está recordado para ese documento, se manda la llave en vez de pedir código
+      const llave = !esperandoCodigo ? llaveDe(documentoActual) : '';
+      let { data, texto } = await hablarConBot(esperandoCodigo ? valor : (llave ? 'RECORDAR:' + llave : documentoActual));
+      // Si la llave ya no sirve (venció o no existe), se olvida y se pide el código normal
+      if (llave && !(data.rol || data.nombre)) {
+        borrarLlave(documentoActual);
+        ({ data, texto } = await hablarConBot(documentoActual));
+      }
       if (/acceso denegado|no registrado/i.test(texto)) {
         mostrarAviso('No encontramos ese documento en la ficha. Revisa el tipo y el número, e intenta de nuevo.');
       } else if (data.pideCodigo) {
         modoCodigo(texto);
       } else if (data.rol || data.nombre) {
+        // Llave nueva (solo llega cuando se entró con el código del correo)
+        if (data.token) {
+          if (recordarEquipo.checked) guardarLlave(documentoActual, data.token);
+          else borrarLlave(documentoActual);
+        }
         modoDocumento();
         entrarALaApp(data, texto);
       } else {
