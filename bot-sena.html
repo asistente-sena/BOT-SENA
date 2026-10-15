@@ -702,6 +702,12 @@
                     <button type="button" class="rapida" data-instructor hidden data-pregunta="Marca como leídos todos los mensajes">📭 Marcar mensajes leídos</button>
           <button type="button" class="rapida" data-instructor hidden data-plantilla="Cambia la fecha límite de la fase ">📅 Cambiar fecha</button>
              <button type="button" class="rapida" data-instructor hidden data-plantilla="Califica el video del grupo G10 con ">🎬 Calificar video</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Panel general">📊 Panel general</button>
+          <button type="button" class="rapida" data-admin hidden data-plantilla="Muéstrame la ficha ">📋 Ver una ficha</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Alertas de fechas">⏰ Alertas de fechas</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Grupos en riesgo">🚨 Grupos en riesgo</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Videos pendientes">🎬 Videos pendientes</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Instructores">🧑‍🏫 Instructores</button>
         </div>
 
         <div class="file-chip" id="fileChip">
@@ -995,8 +1001,16 @@
   function entrarALaApp(data, textoBienvenida) {
     pintarPerfil(data);
         usarFicha(data.ficha);
-        const esInstructor = String(data.rol || '').toUpperCase() === 'INSTRUCTOR';
-    document.querySelectorAll('.rapida').forEach(b => { b.hidden = b.hasAttribute('data-instructor') ? !esInstructor : esInstructor; });
+        const rolMayus = String(data.rol || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const esInstructor = rolMayus === 'INSTRUCTOR';
+    const esAdmin = rolMayus === 'LIDER DE AREA' || rolMayus === 'COORDINADOR';
+    // Cada rol ve solo sus botones: instructor, administrativo (Líder/Coordinador) o estudiante
+    document.querySelectorAll('.rapida').forEach(b => {
+      if (b.hasAttribute('data-admin')) b.hidden = !esAdmin;
+      else if (b.hasAttribute('data-instructor')) b.hidden = !esInstructor;
+      else b.hidden = esInstructor || esAdmin;
+    });
+    document.getElementById('attachBtn').style.display = esAdmin ? 'none' : ''; // los administrativos no suben archivos
     messagesEl.querySelectorAll('.msg').forEach(m => m.remove());
     addMessage(textoBienvenida, 'bot');
     pantallaIngreso.hidden = true;
