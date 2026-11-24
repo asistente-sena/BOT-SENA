@@ -735,6 +735,8 @@
           <button type="button" class="rapida" data-admin hidden data-pregunta="Grupos en riesgo">🚨 Grupos en riesgo</button>
           <button type="button" class="rapida" data-admin hidden data-pregunta="Videos pendientes">🎬 Videos pendientes</button>
           <button type="button" class="rapida" data-admin hidden data-pregunta="Instructores">🧑‍🏫 Instructores</button>
+          <button type="button" class="rapida" data-admin hidden data-pregunta="Actividad de los instructores">🧾 Actividad de instructores</button>
+          <button type="button" class="rapida" data-admin data-coord hidden data-pregunta="Reporte general en Excel">📥 Reporte general</button>
         </div>
 
         <div class="file-chip" id="fileChip">
@@ -1060,7 +1062,8 @@
     const esAdmin = rolMayus === 'LIDER DE AREA' || rolMayus === 'COORDINADOR';
     // Cada rol ve solo sus botones: instructor, administrativo (Líder/Coordinador) o estudiante
     document.querySelectorAll('.rapida').forEach(b => {
-      if (b.hasAttribute('data-admin')) b.hidden = !esAdmin;
+      if (b.hasAttribute('data-coord')) b.hidden = rolMayus !== 'COORDINADOR';
+      else if (b.hasAttribute('data-admin')) b.hidden = !esAdmin;
       else if (b.hasAttribute('data-instructor')) b.hidden = !esInstructor;
       else b.hidden = esInstructor || esAdmin;
     });
